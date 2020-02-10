@@ -1,8 +1,10 @@
 import sys
 import random
-import PySide2
+from PySide2 import QtWidgets, QtCore
+
 
 class MyWidget(QtWidgets.QWidget):
+
     def __init__(self):
         super().__init__()
 
@@ -19,6 +21,15 @@ class MyWidget(QtWidgets.QWidget):
 
         self.button.clicked.connect(self.magic)
 
-
     def magic(self):
         self.text.setText(random.choice(self.hello))
+
+
+if __name__ == "__main__":
+    app = QtWidgets.QApplication([])
+
+    widget = MyWidget()
+    widget.resize(800, 600)
+    widget.show()
+
+    sys.exit(app.exec_())
