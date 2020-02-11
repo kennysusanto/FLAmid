@@ -1,35 +1,82 @@
-import sys
-import random
-from PySide2 import QtWidgets, QtCore
+from tkinter import *
+from dataStructs import *
 
 
-class MyWidget(QtWidgets.QWidget):
+class mainWindow(Frame):
+    def __init__(self, master, **kw):
+        super().__init__(master, **kw)
+        self.master.resizable(False, False)
+        self.master = master
+        self.master.title("RE to eNFA")
+        self.width = 640
+        self.height = 240
+        distx = disty = 100
+        windowsize = str(self.width) + "x" + str(self.height) + "+" + str(distx) + "+" + str(disty)
+        self.master.geometry(windowsize)
+        self.topf = Frame(self.master)
+        self.topf.pack(side="top")
+        self.txt_re = Entry(self.topf, width=65)
+        self.txt_re.pack(side="left")
+        self.btn_build = Button(self.topf, text="Build Automata", command=self.getRE)
+        self.btn_build.pack(side="left")
+        self.midf = Frame(self.master)
+        self.midf.pack(sid="top")
+        self.lbl_info = Label(self.midf, text="RE:")
+        self.lbl_info.pack(side="top")
+        self.txtvarRE = StringVar("")
+        self.lbl_re = Label(self.midf, textvariable=self.txtvarRE)
+        self.lbl_re.pack(side="top")
+        self.lbl_test = Label(self.midf, text="test string:")
+        self.lbl_test.pack(side="top")
+        self.txt_teststr = Entry(self.midf, width=80)
+        self.txt_teststr.pack(side='left')
 
-    def __init__(self):
-        super().__init__()
+        # Binding
+        self.txt_teststr.bind("<KeyRelease>", self.getTestInput)
 
-        self.hello = ["Hallo Welt", "Hei maailma", "Hola Mundo", "Привет мир"]
+        # Initializing Automata
+        self.eNFA = None
 
-        self.button = QtWidgets.QPushButton("Click me!")
-        self.text = QtWidgets.QLabel("Hello World")
-        self.text.setAlignment(QtCore.Qt.AlignCenter)
+    def getRE(self):
+        string = self.txt_re.get()
+        if string == "":
+            print("empty string")
+        else:
+            print("RE: " + string)
+            self.txtvarRE.set(string)
+            self.eNFA = self.compile(string)
 
-        self.layout = QtWidgets.QVBoxLayout()
-        self.layout.addWidget(self.text)
-        self.layout.addWidget(self.button)
-        self.setLayout(self.layout)
-
-        self.button.clicked.connect(self.magic)
-
-    def magic(self):
-        self.text.setText(random.choice(self.hello))
+    def getTestInput(self, *args):
+        string = self.txt_teststr.get()
+        if NFA.match(self.eNFA, string):
+            self.txt_teststr.config(bg="green")
+        else:
+            self.txt_teststr.config(bg="red")
 
 
-if __name__ == "__main__":
-    app = QtWidgets.QApplication([])
+    def compile(self, p, debug=True):
+        def print_tokens(tokens):
+            for t in tokens:
+                print(t)
 
-    widget = MyWidget()
-    widget.resize(800, 600)
-    widget.show()
+        lexer = Lexer(p)
+        parser = Parser(lexer)
+        tokens = parser.parse()
 
-    sys.exit(app.exec_())
+        handler = Handler()
+
+        if debug:
+            print_tokens(tokens)
+
+        nfa_stack = []
+
+        for t in tokens:
+            handler.handlers[t.name](t, nfa_stack)
+
+        assert len(nfa_stack) == 1
+        return nfa_stack.pop()
+
+
+root = Tk()
+run = mainWindow(root)
+run.mainloop()
