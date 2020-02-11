@@ -1,6 +1,7 @@
 # FLAmid
 Formal Language and Automata mid term project
 
-Using python & python qt
+Using python3 & Tkinter
 
-Tutorials on [qt](https://doc.qt.io/qtforpython/quickstart.html)
+Interface in mainWindow.py
+Process in dataStructs.py
