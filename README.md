@@ -1,6 +1,16 @@
 # FLAmid
-Formal Language and Automata mid term project
+Formal Language and Automata mid term project using python3 & Tkinter
 
-Using python & python qt
+Interface in mainWindow.py
 
-Tutorials on [qt](https://doc.qt.io/qtforpython/quickstart.html)
+Process in dataStructs.py
+
+Task list:
+
+[x]Create automata from RE
+
+[x]Test string
+
+[ ]Transition table
+
+[ ]Graphics
