@@ -12,7 +12,7 @@ class NFA:
         self.end = end  # start and end states
         end.is_end = True
 
-    def addstate(self, state, state_set): # add state + recursively add epsilon transitions
+    def addstate(self, state, state_set):  # add state + recursively add epsilon transitions
         if state in state_set:
             return
         state_set.add(state)
@@ -31,6 +31,19 @@ class NFA:
                     self.addstate(trans_state, next_states)
 
             current_states = next_states
+
+        for x in current_states:  # test to print current state we're in
+            print("Current: " + x.name)  # print state name
+            trans = []
+            for y in x.transitions:
+                trans.append((y, x.transitions[y].name))  # print possible transitions from current state
+            print(trans)
+            eps = []
+            for y in x.epsilon:
+                eps.append(y.name)
+            print(eps)
+            if x.is_end:
+                print("this is final state")
 
         for s in current_states:
             if s.is_end:
@@ -141,7 +154,7 @@ class Parser:
             self.consume('CHAR')
 
 
-class ParseError(Exception):pass
+class ParseError(Exception): pass
 
 
 class Token:
