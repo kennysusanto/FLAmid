@@ -1,5 +1,6 @@
 from tkinter import *
 from dataStructs import *
+from graphviz import Digraph
 
 
 class SimpleTable(Frame):
@@ -31,8 +32,8 @@ class mainWindow(Frame):
         # self.master.resizable(False, False)
         self.master = master
         self.master.title("RE to eNFA")
-        self.width = 640
-        self.height = 240
+        self.width = 768
+        self.height = 400
         distx = disty = 100
         windowsize = str(self.width) + "x" + str(self.height) + "+" + str(distx) + "+" + str(disty)
         self.master.geometry(windowsize)
@@ -79,7 +80,7 @@ class mainWindow(Frame):
 
             # printing all states test--------------------------------------------
             # print(type(self.eNFA))
-            self.printallstates(self.eNFA.start)  # printing all states
+            self.getallstates(self.eNFA.start)  # printing all states
             # for x in self.states:
             #     print(x.name)
             # print("num of states: " + str(self.i))
@@ -168,22 +169,31 @@ class mainWindow(Frame):
                 if len(x.epsilon) is 0:
                     row.append("empty set")
                 else:
+                    tmp = []
                     for y in x.epsilon:
-                        row.append(y.name)
+                        tmp.append(y.name)
+                    row.append(tmp)
 
+                # unimportant test here --
                 for y in x.transitions:
                     trans.append((y, x.transitions[y].name))
                 for y in x.epsilon:
                     eps.append(y.name)
+                # end of unimportant test here --
+
                 # print(x.name, trans, eps)
-                # print(row)
+                print(row)
                 ctr = 0
                 while ctr < self.j:
                     ttable.set(idx+1, ctr, row[ctr])
                     ctr += 1
+            # end of Inserting states and transitions to transition table-------------------
+            self.toGraph()  # creating graph
 
-    def printallstates(self, start):
+    def getallstates(self, start):
         if self.state_count is 0:
+            return
+        if start in self.states:
             return
         self.state_count -= 1
         curr = start
@@ -195,10 +205,47 @@ class mainWindow(Frame):
 
         for x in curr.transitions:
             self.j += 1
-            self.printallstates(curr.transitions[x])
+            self.getallstates(curr.transitions[x])
 
         for idx, x in enumerate(curr.epsilon):
-            self.printallstates(curr.epsilon[idx])
+            self.getallstates(curr.epsilon[idx])
+
+    def toGraph(self):
+        states = self.states
+        # print(len(states))
+        edges = []
+        for s in states:
+            # edges format = (from, to, label)
+            for t in s.transitions:
+                tmp = []
+                tmp.append(s.name)
+                tmp.append(s.transitions[t].name)
+                tmp.append(t)
+                edges.append(tmp)
+            for e in s.epsilon:
+                tmp = []
+                tmp.append(s.name)
+                tmp.append(e.name)
+                tmp.append("epsilon")
+                edges.append(tmp)
+        # print(edges)
+        g = Digraph('G', filename='eNFA_graph.gv', directory='graphs')
+        g.attr(rankdir='LR')  # orientation Left to Right
+
+        # final state
+        g.attr('node', shape='doublecircle')
+        for s in states:
+            if s.is_end:
+                g.node(s.name)
+
+        # else
+        g.attr('node', shape='circle')
+        for e in edges:
+            g.edge(e[0], e[1], label=e[2])
+
+        # view in viewer
+        g.view()
+
 
     def getTestInput(self, *args):
         string = self.txt_teststr.get()

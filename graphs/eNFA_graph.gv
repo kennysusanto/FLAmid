@@ -1,0 +1,16 @@
+digraph G {
+	rankdir=LR
+	node [shape=doublecircle]
+	s8
+	node [shape=circle]
+	s7 -> s5 [label=epsilon]
+	s7 -> s8 [label=epsilon]
+	s5 -> s1 [label=epsilon]
+	s5 -> s3 [label=epsilon]
+	s1 -> s2 [label=0]
+	s2 -> s6 [label=epsilon]
+	s6 -> s8 [label=epsilon]
+	s6 -> s5 [label=epsilon]
+	s3 -> s4 [label=1]
+	s4 -> s6 [label=epsilon]
+}
