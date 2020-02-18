@@ -11,6 +11,6 @@ Task list:
 
 [x]Test string
 
-[ ]Transition table
+[x]Transition table
 
-[ ]Graphics
+[x]Graphics
