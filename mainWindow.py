@@ -104,7 +104,13 @@ class mainWindow(Frame):
 
             # Inserting states and transitions to transition table-------------------
             for idx, x in enumerate(self.states):
-                row = [x.name]
+                row = []
+                if x.is_end:  # checks whether the state is end state
+                    row.append('*' + str(x.name))  # appends *statename if end state
+                elif x is self.eNFA.start:
+                    row.append('>' + str(x.name))  # appends >statename if start state
+                else:
+                    row.append(x.name)
                 trans = []
                 eps = []
                 ctr = 0
@@ -167,7 +173,7 @@ class mainWindow(Frame):
                         row[26] = x.transitions[y].name
 
                 if len(x.epsilon) is 0:
-                    row.append("empty set")
+                    row.append("empty set")  # fills empty set if state doesnt have epsilon transition
                 else:
                     tmp = []
                     for y in x.epsilon:
@@ -184,8 +190,11 @@ class mainWindow(Frame):
                 # print(x.name, trans, eps)
                 print(row)
                 ctr = 0
-                while ctr < self.j:
-                    ttable.set(idx+1, ctr, row[ctr])
+                while ctr < self.j:  # while counter is less than length of columns
+                    if ctr is self.j - 1:  # if counter is equal to length of columns - 1 meaning the epsilon column
+                        ttable.set(idx + 1, ctr, row[ctr])  # set value of table cell
+                    else:
+                        ttable.set(idx+1, ctr, row[ctr])  # set value of table cell
                     ctr += 1
             # end of Inserting states and transitions to transition table-------------------
             self.toGraph()  # creating graph
@@ -232,6 +241,10 @@ class mainWindow(Frame):
         g = Digraph('G', filename='eNFA_graph.gv', directory='graphs')
         g.attr(rankdir='LR')  # orientation Left to Right
 
+        # start arrow
+        g.attr('node', shape='point')
+        g.node('sa')
+
         # final state
         g.attr('node', shape='doublecircle')
         for s in states:
@@ -240,6 +253,7 @@ class mainWindow(Frame):
 
         # else
         g.attr('node', shape='circle')
+        g.edge('sa', states[0].name)
         for e in edges:
             g.edge(e[0], e[1], label=e[2])
 
